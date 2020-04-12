@@ -1,7 +1,12 @@
+"""
+The basis for this was originally created for the oshwabadge2020:
+https://github.com/oshwabadge2020/apps/tree/master/app-loader
+
+Adapted for PyPortal and Touchscreen by Foamyguy
+"""
 import os
 import board
-import digitalio
-import gamepad
+
 import adafruit_imageload
 import time
 from time import sleep
@@ -10,18 +15,15 @@ from adafruit_display_text import label
 from adafruit_button import Button
 import adafruit_touchscreen
 import displayio
-SELECT = 1 << 0
-NEXT = 1 << 1
-PREV = 1 << 2
+
 COLOR = 0xFFFFFF
 FONT = terminalio.FONT
 TOP_OFFSET = 3
 MARGIN = 3
 APP_DIR = "/apps"
 MENU_START = 10+TOP_OFFSET+MARGIN
-SPLASH_FILENAME = "10yrs_240.bmp"
-CURSOR_FILENAME = "8px_cursors.bmp"
 
+CURSOR_FILENAME = "8px_cursors.bmp"
 
 # --| Button Config |-------------------------------------------------
 BUTTON_X = 3
@@ -46,9 +48,6 @@ ts = adafruit_touchscreen.Touchscreen(
     )
 
 
-
-
-
 class Loader:
     def __init__(self):
 
@@ -60,11 +59,9 @@ class Loader:
         self.files_available = self.check_for_apps()
         self.file_count = len(self.files_available)
 
-
         self.init_menu()
         self.display.rotation = 270
         self.display.show(self.screen_group)
-
 
     def init_cursor(self):
         self.cursor_group = displayio.Group()
@@ -147,19 +144,15 @@ class Loader:
 
         self.screen_group.append(self.program_menu)
 
-
         self.screen_group.append(self.up_button.group)
         self.screen_group.append(self.down_button.group)
         self.screen_group.append(self.run_button.group)
-
-
 
     def run_file(self, filename):
         module_name = APP_DIR+"/"+filename.strip(".py")
         mod = __import__(module_name)
         self.display.show(None)
         mod.main()
-
 
         ok = False
         while not ok:
@@ -168,33 +161,12 @@ class Loader:
                 self.display.show(self.screen_group)
                 break
 
-
     def check_for_apps(self, appdir=APP_DIR):
         return os.listdir(appdir)
 
     #def print_list(display, programs, cur_index):
 
-    if False:
-        pass
 
-
-    # Open the file
-
-    # splash_bmp, splash_pal = adafruit_imageload.load(SPLASH_FILENAME, bitmap=displayio.Bitmap, palette=displayio.Palette)
-    # Create a Group to hold the TileGrid
-    # splash_group = displayio.Group()
-    # board.DISPLAY.brightness = 0.0
-    # time.sleep(2)
-    # loader_banner = label.Label(FONT, text="Cursor Index: 0", color=COLOR)
-    # loader_banner.x = 10
-    # loader_banner.y = 160
-    # display.show(loader_banner)
-
-
-    # splash = displayio.TileGrid(splash_bmp, pixel_shader=splash_pal)
-    # splash_group.append(splash)
-    # splash_group.scale = 1
-    # display.show(splash_group)
     def run(self):
         last_update =  time.monotonic()
         i = 0
@@ -250,22 +222,7 @@ class Loader:
                 self.run_file(self.files_available[self.cursor_index])
 
             prev_btns = buttons
-            """
-            buttons = self.pad.get_pressed()
-            if buttons & NEXT:
-                self.cursor_index += 1
-                if self.cursor_index >= self.file_count:
-                    self.cursor_index = 0
-            if buttons & PREV:
-                self.cursor_index -= 1
-                if self.cursor_index < 0:
-                    self.cursor_index = self.file_count -1
-            elif buttons & SELECT:
-                self.run_file(self.files_available[self.cursor_index])
-            while buttons:
-                # Wait for all buttons to be released.
-                buttons = self.pad.get_pressed()
-            """
+
 if __name__ == "__main__":
     loader = Loader()
     loader.run()
